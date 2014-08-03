@@ -7,6 +7,7 @@ import android.support.v7.app.MediaRouteActionProvider;
 import android.support.v7.media.MediaRouteSelector;
 import android.support.v7.media.MediaRouter;
 import android.util.Log;
+import android.view.Display;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -22,6 +23,7 @@ import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
 import com.heb.castor.app.cast.CastorCastClientListener;
 import com.heb.castor.app.cast.CastorMediaRouterCallback;
+import com.heb.castor.app.presentations.StandByPresentation;
 
 import java.io.IOException;
 
@@ -33,11 +35,12 @@ public class MainActivity extends ActionBarActivity implements GoogleApiClient.C
     private MediaRouter mediaRouter;
     private MediaRouteSelector mediaRouteSelector;
     private CastorMediaRouterCallback mediaRouterCallback;
+    private Display castDisplay;
 
     private GoogleApiClient googleApiClient;
 
     private Button launchApplicationButton;
-    private Button launchMediaApplicationButton;
+    private Button launchPresentationOnRemoteDisplay;
     private Button sendMessageButton;
 
     @Override
@@ -46,7 +49,7 @@ public class MainActivity extends ActionBarActivity implements GoogleApiClient.C
         setContentView(R.layout.activity_main);
 
         launchApplicationButton = (Button) findViewById(R.id.launchApplicationButton);
-        launchMediaApplicationButton = (Button) findViewById(R.id.launchMediaApplicationButton);
+        launchPresentationOnRemoteDisplay = (Button) findViewById(R.id.launchMediaApplicationButton);
         sendMessageButton = (Button) findViewById(R.id.sendMessageButton);
 
         sendMessageButton.setOnClickListener(new View.OnClickListener() {
@@ -63,6 +66,13 @@ public class MainActivity extends ActionBarActivity implements GoogleApiClient.C
             }
         });
 
+        launchPresentationOnRemoteDisplay.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startStandbyPresentation(castDisplay);
+            }
+        });
+
         mediaRouter = MediaRouter.getInstance(getApplicationContext());
         mediaRouteSelector = new MediaRouteSelector.Builder()
                 .addControlCategory(CastMediaControlIntent.categoryForCast(getString(R.string.cast_app_id)))
@@ -71,12 +81,21 @@ public class MainActivity extends ActionBarActivity implements GoogleApiClient.C
 
     }
 
+    private void startStandbyPresentation(Display castDisplay) {
+        StandByPresentation standByPresentation = new StandByPresentation(this, castDisplay);
+        standByPresentation.show();
+    }
+
     @Override
     protected void onResume() {
         super.onResume();
 
-        mediaRouter.addCallback(mediaRouteSelector, mediaRouterCallback,
-                MediaRouter.CALLBACK_FLAG_PERFORM_ACTIVE_SCAN);
+        if(isMirroring()) {
+            launchPresentationOnRemoteDisplay.setEnabled(true);
+        } else {
+            mediaRouter.addCallback(mediaRouteSelector, mediaRouterCallback,
+                    MediaRouter.CALLBACK_FLAG_PERFORM_ACTIVE_SCAN);
+        }
     }
 
     @Override
@@ -87,22 +106,9 @@ public class MainActivity extends ActionBarActivity implements GoogleApiClient.C
         super.onPause();
     }
 
-    /**
-     * TODO
-     * check if REALLY need twice!
-     */
-    @Override
-    protected void onStart() {
-        super.onStart();
-
-        mediaRouter.addCallback(mediaRouteSelector, mediaRouterCallback,
-                MediaRouter.CALLBACK_FLAG_PERFORM_ACTIVE_SCAN);
-    }
-
     @Override
     protected void onStop() {
         mediaRouter.removeCallback(mediaRouterCallback);
-
         super.onStop();
     }
 
@@ -124,6 +130,13 @@ public class MainActivity extends ActionBarActivity implements GoogleApiClient.C
         return super.onOptionsItemSelected(item);
     }
 
+    private boolean isMirroring() {
+        MediaRouter.RouteInfo route = mediaRouter.getSelectedRoute();
+        castDisplay = route.getPresentationDisplay();
+
+        return castDisplay != null;
+    }
+
     public void connectToReceiverApplication(CastDevice castDevice, Cast.Listener listener) {
         Cast.CastOptions.Builder apiOptionsBuilder = Cast.CastOptions.builder(castDevice, listener);
 
@@ -140,12 +153,6 @@ public class MainActivity extends ActionBarActivity implements GoogleApiClient.C
         if(googleApiClient != null) {
             googleApiClient.disconnect();
             googleApiClient = null;
-        }
-    }
-
-    public void playItem(final MediaInfo mediaInfo) {
-        if(mediaInfo == null) {
-            return;
         }
     }
 

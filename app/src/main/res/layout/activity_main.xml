@@ -18,7 +18,8 @@
         android:id="@+id/launchMediaApplicationButton"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:text="Launch Media Application"
+        android:enabled="false"
+        android:text="Launch Presentation"
         android:layout_below="@id/launchApplicationButton"/>
 
     <Button
