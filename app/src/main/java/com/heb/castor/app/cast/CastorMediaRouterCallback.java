@@ -12,6 +12,7 @@ public class CastorMediaRouterCallback extends MediaRouter.Callback {
 
     private final Context context;
     private CastDevice castDevice;
+    private MediaRouter.RouteInfo routeInfo;
 
     public CastorMediaRouterCallback(Context context) {
         this.context = context;
@@ -21,9 +22,10 @@ public class CastorMediaRouterCallback extends MediaRouter.Callback {
     public void onRouteSelected(MediaRouter router, MediaRouter.RouteInfo info) {
         Log.d(TAG, "onRouteSelected");
         castDevice = CastDevice.getFromBundle(info.getExtras());
+        routeInfo = info;
 
         Toast.makeText(context,
-                "blablalba", Toast.LENGTH_LONG).show();
+                "connected", Toast.LENGTH_LONG).show();
     }
 
     @Override

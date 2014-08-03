@@ -9,32 +9,66 @@ import android.support.v7.media.MediaRouter;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Toast;
+import android.view.View;
+import android.widget.Button;
 
+import com.google.android.gms.cast.Cast;
 import com.google.android.gms.cast.CastDevice;
 import com.google.android.gms.cast.CastMediaControlIntent;
+import com.google.android.gms.cast.MediaInfo;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.common.api.Status;
+import com.heb.castor.app.cast.CastorCastClientListener;
 import com.heb.castor.app.cast.CastorMediaRouterCallback;
 
-import static android.support.v7.media.MediaRouter.RouteInfo;
+import java.io.IOException;
 
-public class MainActivity extends ActionBarActivity {
+public class MainActivity extends ActionBarActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
     private static final String TAG = MainActivity.class.getSimpleName();
+
+    private static final String NAMESPACE = "urn:x-cast:com.heb.castor.app";
 
     private MediaRouter mediaRouter;
     private MediaRouteSelector mediaRouteSelector;
-    private MediaRouter.Callback mediaRouterCallback;
-    private CastDevice castDevice;
+    private CastorMediaRouterCallback mediaRouterCallback;
+
+    private GoogleApiClient googleApiClient;
+
+    private Button launchApplicationButton;
+    private Button launchMediaApplicationButton;
+    private Button sendMessageButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        launchApplicationButton = (Button) findViewById(R.id.launchApplicationButton);
+        launchMediaApplicationButton = (Button) findViewById(R.id.launchMediaApplicationButton);
+        sendMessageButton = (Button) findViewById(R.id.sendMessageButton);
+
+        sendMessageButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                sendMessage("Salut Salut!");
+            }
+        });
+
+        launchApplicationButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                connectToReceiverApplication(mediaRouterCallback.getCastDevice(), new CastorCastClientListener());
+            }
+        });
+
         mediaRouter = MediaRouter.getInstance(getApplicationContext());
         mediaRouteSelector = new MediaRouteSelector.Builder()
                 .addControlCategory(CastMediaControlIntent.categoryForCast(getString(R.string.cast_app_id)))
                 .build();
         mediaRouterCallback = new CastorMediaRouterCallback(getApplicationContext());
+
     }
 
     @Override
@@ -88,5 +122,94 @@ public class MainActivity extends ActionBarActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         return super.onOptionsItemSelected(item);
+    }
+
+    public void connectToReceiverApplication(CastDevice castDevice, Cast.Listener listener) {
+        Cast.CastOptions.Builder apiOptionsBuilder = Cast.CastOptions.builder(castDevice, listener);
+
+        googleApiClient = new GoogleApiClient.Builder(this)
+                .addApi(Cast.API, apiOptionsBuilder.build())
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .build();
+
+        googleApiClient.connect();
+    }
+
+    public void disconnectFromReceiverApplication() {
+        if(googleApiClient != null) {
+            googleApiClient.disconnect();
+            googleApiClient = null;
+        }
+    }
+
+    public void playItem(final MediaInfo mediaInfo) {
+        if(mediaInfo == null) {
+            return;
+        }
+    }
+
+    private void sendMessage(String message) {
+        try {
+            Cast.CastApi.sendMessage(googleApiClient, NAMESPACE, message)
+                    .setResultCallback(
+                            new ResultCallback<Status>() {
+                                @Override
+                                public void onResult(Status status) {
+                                    if (!status.isSuccess()) {
+                                        Log.e(TAG, "Sending message failed");
+                                    }
+                                }
+                            }
+                    );
+        } catch (Exception e) {
+            Log.e(TAG, "Exception while sending message", e);
+        }
+    }
+
+    private void launchReceiverApplication() {
+        try {
+
+            Cast.CastApi.launchApplication(googleApiClient, getString(R.string.cast_app_id, false))
+                    .setResultCallback(new ResultCallback<Cast.ApplicationConnectionResult>() {
+                        @Override
+                        public void onResult(Cast.ApplicationConnectionResult result) {
+                            try {
+                                Cast.CastApi.setMessageReceivedCallbacks(googleApiClient,
+                                        NAMESPACE,
+                                        incomingMsgHandler);
+                            } catch (IOException e) {
+                                Log.e(TAG, "Exception while creating channel", e);
+                            }
+                        }
+                    });
+        } catch (Exception e){
+            Log.e(TAG, "Failed to launch application", e);
+        }
+    }
+
+    private void stopReceiverApplication() {
+        Cast.CastApi.stopApplication(googleApiClient);
+    }
+
+    public final Cast.MessageReceivedCallback incomingMsgHandler = new Cast.MessageReceivedCallback() {
+        @Override
+        public void onMessageReceived(CastDevice castDevice, String namespace, String message) {
+        }
+    };
+
+    @Override
+    public void onConnected(Bundle bundle) {
+        launchReceiverApplication();
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+
+    }
+
+    @Override
+    public void onConnectionFailed(ConnectionResult connectionResult) {
+        Log.e(TAG, "Failed to connect: " + connectionResult.getErrorCode());
     }
 }
