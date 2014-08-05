@@ -87,18 +87,6 @@ public class MainActivity extends ActionBarActivity implements GoogleApiClient.C
         super.onPause();
     }
 
-    /**
-     * TODO
-     * check if REALLY need twice!
-     */
-    @Override
-    protected void onStart() {
-        super.onStart();
-
-        mediaRouter.addCallback(mediaRouteSelector, mediaRouterCallback,
-                MediaRouter.CALLBACK_FLAG_PERFORM_ACTIVE_SCAN);
-    }
-
     @Override
     protected void onStop() {
         mediaRouter.removeCallback(mediaRouterCallback);
@@ -169,7 +157,6 @@ public class MainActivity extends ActionBarActivity implements GoogleApiClient.C
 
     private void launchReceiverApplication() {
         try {
-
             Cast.CastApi.launchApplication(googleApiClient, getString(R.string.cast_app_id, false))
                     .setResultCallback(new ResultCallback<Cast.ApplicationConnectionResult>() {
                         @Override
