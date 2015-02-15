@@ -9,24 +9,24 @@
     tools:context=".MainActivity">
 
     <Button
+        android:id="@+id/doConnectButton"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="Do connect"/>
+
+    <Button
         android:id="@+id/launchApplicationButton"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:text="Launch Application"/>
-
-    <Button
-        android:id="@+id/launchMediaApplicationButton"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:text="Launch Media Application"
-        android:layout_below="@id/launchApplicationButton"/>
+        android:text="Launch Application"
+        android:layout_below="@id/doConnectButton"/>
 
     <Button
         android:id="@+id/sendMessageButton"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:text="Send Message"
-        android:layout_below="@id/launchMediaApplicationButton"/>
+        android:layout_below="@id/launchApplicationButton"/>
 
     <Button
         android:id="@+id/startServerButton"

@@ -32,6 +32,7 @@ public class MainActivity extends ActionBarActivity implements GoogleApiClient.C
     private static final String TAG = MainActivity.class.getSimpleName();
 
     private static final String NAMESPACE = "urn:x-cast:com.heb.castor.app";
+    private static final String MEDIA_NAMESPACE = "urn:x-cast:com.google.cast.media";
 
     private MediaRouter mediaRouter;
     private MediaRouteSelector mediaRouteSelector;
@@ -41,8 +42,10 @@ public class MainActivity extends ActionBarActivity implements GoogleApiClient.C
 
     private EmbedHttpServer httpServer;
 
+    private String appId;
+
     private Button launchApplicationButton;
-    private Button launchMediaApplicationButton;
+    private Button doConnectButton;
     private Button sendMessageButton;
     private Button startServerButton;
     private Button stopServerButton;
@@ -54,7 +57,7 @@ public class MainActivity extends ActionBarActivity implements GoogleApiClient.C
         setContentView(R.layout.activity_main);
 
         launchApplicationButton = (Button) findViewById(R.id.launchApplicationButton);
-        launchMediaApplicationButton = (Button) findViewById(R.id.launchMediaApplicationButton);
+        doConnectButton = (Button) findViewById(R.id.doConnectButton);
         sendMessageButton = (Button) findViewById(R.id.sendMessageButton);
         startServerButton = (Button) findViewById(R.id.startServerButton);
         stopServerButton = (Button) findViewById(R.id.stopServerButton);
@@ -67,10 +70,17 @@ public class MainActivity extends ActionBarActivity implements GoogleApiClient.C
             }
         });
 
-        launchApplicationButton.setOnClickListener(new View.OnClickListener() {
+        doConnectButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 connectToReceiverApplication(mediaRouterCallback.getCastDevice(), new CastorCastClientListener());
+            }
+        });
+
+        launchApplicationButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                launchReceiverApplication();
             }
         });
 
@@ -88,9 +98,12 @@ public class MainActivity extends ActionBarActivity implements GoogleApiClient.C
             }
         });
 
+        //appId = getString(R.string.cast_app_id);
+        appId = CastMediaControlIntent.DEFAULT_MEDIA_RECEIVER_APPLICATION_ID;
+
         mediaRouter = MediaRouter.getInstance(getApplicationContext());
         mediaRouteSelector = new MediaRouteSelector.Builder()
-                .addControlCategory(CastMediaControlIntent.categoryForCast(getString(R.string.cast_app_id)))
+                .addControlCategory(CastMediaControlIntent.categoryForCast(appId))
                 .build();
         mediaRouterCallback = new CastorMediaRouterCallback(getApplicationContext());
 
@@ -214,11 +227,12 @@ public class MainActivity extends ActionBarActivity implements GoogleApiClient.C
 
     private void launchReceiverApplication() {
         try {
-            Cast.CastApi.launchApplication(googleApiClient, getString(R.string.cast_app_id, false))
+            Cast.CastApi.launchApplication(googleApiClient, appId, false)
                     .setResultCallback(new ResultCallback<Cast.ApplicationConnectionResult>() {
                         @Override
                         public void onResult(Cast.ApplicationConnectionResult result) {
                             try {
+                                //TODO: check result to confirm connection
                                 Cast.CastApi.setMessageReceivedCallbacks(googleApiClient,
                                         NAMESPACE,
                                         incomingMsgHandler);
@@ -244,18 +258,18 @@ public class MainActivity extends ActionBarActivity implements GoogleApiClient.C
     };
 
     @Override
+    public void onConnectionFailed(ConnectionResult connectionResult) {
+        Log.e(TAG, "Failed to connect: " + connectionResult.getErrorCode());
+    }
+
+    // GoogleApiClient.ConnectionCallbacks.onConnected
+    @Override
     public void onConnected(Bundle bundle) {
-        //FIXME: doesnt seem to work?
         launchReceiverApplication();
     }
 
     @Override
     public void onConnectionSuspended(int i) {
-
-    }
-
-    @Override
-    public void onConnectionFailed(ConnectionResult connectionResult) {
-        Log.e(TAG, "Failed to connect: " + connectionResult.getErrorCode());
+        Log.e(TAG, "onConnectionSuspended ");
     }
 }
