@@ -2,7 +2,7 @@
 <resources>
 
     <string name="app_name">Castor</string>
-    <string name="hello_world">Hello world!</string>
+    <string name="cast_app_id">92F5361D</string>
     <string name="action_settings">Settings</string>
 
 </resources>

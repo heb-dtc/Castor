@@ -28,4 +28,25 @@
         android:text="Send Message"
         android:layout_below="@id/launchMediaApplicationButton"/>
 
+    <Button
+        android:id="@+id/startServerButton"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="Start Server"
+        android:layout_below="@id/sendMessageButton"/>
+
+    <Button
+        android:id="@+id/stopServerButton"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="Stop Server"
+        android:enabled="false"
+        android:layout_below="@id/startServerButton"/>
+
+    <TextView
+        android:id="@+id/ipadressView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/stopServerButton"/>
+
 </RelativeLayout>

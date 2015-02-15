@@ -1,5 +1,6 @@
 package com.heb.castor.app;
 
+import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.ActionBarActivity;
@@ -11,6 +12,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 
 import com.google.android.gms.cast.Cast;
 import com.google.android.gms.cast.CastDevice;
@@ -22,6 +24,7 @@ import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
 import com.heb.castor.app.cast.CastorCastClientListener;
 import com.heb.castor.app.cast.CastorMediaRouterCallback;
+import com.heb.castor.app.server.EmbedHttpServer;
 
 import java.io.IOException;
 
@@ -36,9 +39,14 @@ public class MainActivity extends ActionBarActivity implements GoogleApiClient.C
 
     private GoogleApiClient googleApiClient;
 
+    private EmbedHttpServer httpServer;
+
     private Button launchApplicationButton;
     private Button launchMediaApplicationButton;
     private Button sendMessageButton;
+    private Button startServerButton;
+    private Button stopServerButton;
+    private TextView ipTextView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,6 +56,9 @@ public class MainActivity extends ActionBarActivity implements GoogleApiClient.C
         launchApplicationButton = (Button) findViewById(R.id.launchApplicationButton);
         launchMediaApplicationButton = (Button) findViewById(R.id.launchMediaApplicationButton);
         sendMessageButton = (Button) findViewById(R.id.sendMessageButton);
+        startServerButton = (Button) findViewById(R.id.startServerButton);
+        stopServerButton = (Button) findViewById(R.id.stopServerButton);
+        ipTextView = (TextView) findViewById(R.id.ipadressView);
 
         sendMessageButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -63,6 +74,20 @@ public class MainActivity extends ActionBarActivity implements GoogleApiClient.C
             }
         });
 
+        startServerButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startLocalServer();
+            }
+        });
+
+        stopServerButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                stopLocalServer();
+            }
+        });
+
         mediaRouter = MediaRouter.getInstance(getApplicationContext());
         mediaRouteSelector = new MediaRouteSelector.Builder()
                 .addControlCategory(CastMediaControlIntent.categoryForCast(getString(R.string.cast_app_id)))
@@ -71,12 +96,40 @@ public class MainActivity extends ActionBarActivity implements GoogleApiClient.C
 
     }
 
+    private void stopLocalServer() {
+        startServerButton.setEnabled(true);
+        stopServerButton.setEnabled(false);
+
+        httpServer.stop();
+    }
+
+    private void startLocalServer() {
+        httpServer = new EmbedHttpServer();
+        try {
+            httpServer.start();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        stopServerButton.setEnabled(true);
+        startServerButton.setEnabled(false);
+    }
+
     @Override
     protected void onResume() {
         super.onResume();
 
+        ipTextView.setText(getLocalIp());
+
         mediaRouter.addCallback(mediaRouteSelector, mediaRouterCallback,
                 MediaRouter.CALLBACK_FLAG_PERFORM_ACTIVE_SCAN);
+    }
+
+    String getLocalIp() {
+        WifiManager wifiManager = (WifiManager) getSystemService(WIFI_SERVICE);
+        int ipAddress = wifiManager.getConnectionInfo().getIpAddress();
+        final String formatedIpAddress = String.format("%d.%d.%d.%d", (ipAddress & 0xff), (ipAddress >> 8 & 0xff),
+                (ipAddress >> 16 & 0xff), (ipAddress >> 24 & 0xff));
+        return formatedIpAddress;
     }
 
     @Override
@@ -90,6 +143,10 @@ public class MainActivity extends ActionBarActivity implements GoogleApiClient.C
     @Override
     protected void onStop() {
         mediaRouter.removeCallback(mediaRouterCallback);
+
+        if (httpServer != null) {
+            httpServer.stop();
+        }
 
         super.onStop();
     }
@@ -182,11 +239,13 @@ public class MainActivity extends ActionBarActivity implements GoogleApiClient.C
     public final Cast.MessageReceivedCallback incomingMsgHandler = new Cast.MessageReceivedCallback() {
         @Override
         public void onMessageReceived(CastDevice castDevice, String namespace, String message) {
+            Log.e(TAG, "Message reveived from cast application: " + message);
         }
     };
 
     @Override
     public void onConnected(Bundle bundle) {
+        //FIXME: doesnt seem to work?
         launchReceiverApplication();
     }
 

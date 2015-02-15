@@ -1,4 +1,4 @@
-package fi.iki.elonen;
+package com.heb.castor.app.server;
 
 import java.io.*;
 import java.net.InetAddress;
