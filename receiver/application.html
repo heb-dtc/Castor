@@ -2,63 +2,63 @@
 <head>
 	<script src="https://www.gstatic.com/cast/sdk/libs/receiver/2.0.0/cast_receiver.js" />
 	<script type="text/javascript">
-    		var app_id = "";
+    		var app_id = "92F5361D";
 	    	var namespace = "urn:x-cast:com.heb.castor.app";
 
 	    	function log(str) {
-			console.log(str);
+			    console.log(str);
 
-			var newSpan = document.createElement("span");
-			var newContent = document.createTextNode(str);
-			newSpan.appendChild(newContent);
+			    var newSpan = document.createElement("span");
+			    var newContent = document.createTextNode(str);
+			    newSpan.appendChild(newContent);
 
-			var root = document.getElementById("root");
-			root.appendChild(newSpan);
-			root.appendChild(document.createElement("br"));
+			    var root = document.getElementById("root");
+			    root.appendChild(newSpan);
+			    root.appendChild(document.createElement("br"));
 	    	}
 
 	    	function onChannelOpened(event) {
-			log("onChannelOpened. Total number of channels: " + window.castReceiverManager.getSenders().length);
+			    log("onChannelOpened. Total number of channels: " + window.castReceiverManager.getSenders().length);
 	    	}
 
 	    	function onChannelClosed(event) {
-			log("onChannelClosed. Total number of channels: " + window.castReceiverManager.getSenders().length);
-			if (window.castReceiverManager.getSenders().length == 0) window.close();
+			    log("onChannelClosed. Total number of channels: " + window.castReceiverManager.getSenders().length);
+			    if (window.castReceiverManager.getSenders().length == 0) window.close();
 	    	}
 
 	    	function onError() {
-			log("onError");
+			    log("onError");
 	    	}
 
 	    	function onMessage(event) {
-			var message = event.data;
-			var senderId = event.senderId;
-			log("message from: " + senderId + " message: " + message);
+			    var message = event.data;
+			    var senderId = event.senderId;
+			    log("message from: " + senderId + " message: " + message);
 	    	}
 
 	    	function onLoad() {
-			log("document loaded");
+			    log("document loaded");
 
-			window.castReceiverManager = cast.receiver.CastReceiverManager.getInstance();
+			    window.castReceiverManager = cast.receiver.CastReceiverManager.getInstance();
 
-			window.castReceiverManager.onSenderConnected = onChannelOpened;
-			window.castReceiverManager.onSenderDisconnected = onChannelClosed;
+			    window.castReceiverManager.onSenderConnected = onChannelOpened;
+			    window.castReceiverManager.onSenderDisconnected = onChannelClosed;
 
-			window.customMessageBus = window.castReceiverManager.getCastMessageBus(namespace);
-			window.customMessageBus.onMessage = onMessage;
+			    window.customMessageBus = window.castReceiverManager.getCastMessageBus(namespace);
+			    window.customMessageBus.onMessage = onMessage;
 
-			window.castReceiverManager.start();
+			    window.castReceiverManager.start();
 
-			log("cast started");
+			    log("cast started");
 	    		window.setInterval(onTimer, 2000);
-		}
+		    }
 
-		function onTimer() {
-		    	broadcast("timer");
-		}
+		    function onTimer() {
+		        broadcast("timer");
+		    }
 
 	    	function broadcast(message) {
-			window.customMessageBus.broadcast(message);
+			    window.customMessageBus.broadcast(message);
 	    	}
 
 		window.addEventListener("load", onLoad);
@@ -67,6 +67,9 @@
     	<div id="root" style="position:absolute; top:0; left:0; height:100%; width:100%; color:#FFFFFF;">
         chromecast demo<br>
     	<span>document loaded</span><br><span>cast started</span><br></div>
+        <audio controls autoplay>
+            <source src="192.168.1.100:8080/music" type="audio/mpeg">
+        </audio>
 </body>
 </html>
 
