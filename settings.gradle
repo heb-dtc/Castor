@@ -1,1 +1,1 @@
-include ':app', ':nanoHttp'
+include ':app'

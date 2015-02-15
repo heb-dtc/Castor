@@ -30,30 +30,30 @@ public class EmbedHttpServer extends NanoHTTPD {
         Log.e(TAG, method + " '" + uri + "' ");
 
         if (uri.equals(MUSIC_ENDPOINT)) {
-            return getMusicStream();
+            return serveMusicStream();
         } else if (uri.equals(IMGAE_ENDPOINT)) {
-            return getImage();
+            return serveImage();
         } else if (uri.equals(VIDEO_ENDPOINT)) {
-            return getVideoStream();
+            return serveVideoStream();
         } else if (uri.equals(PDF_ENDPOINT)) {
-            return getFile();
+            return serveFile();
         }
         return generateIndexHtml();
     }
 
-    private Response getImage() {
+    private Response serveImage() {
         return getFullResponse("image/png", "/Download/floppies0005.png");
     }
 
-    private Response getMusicStream() {
+    private Response serveMusicStream() {
         return getFullResponse("audio/mpeg", "/music/mc_soraal.mp3");
     }
 
-    private Response getVideoStream() {
+    private Response serveVideoStream() {
         return getFullResponse("video/mp4", "/Download/VID_20131207_195120.mp4");
     }
 
-    private Response getFile() {
+    private Response serveFile() {
         return getFullResponse("application/pdf", "/Download/slides.pdf");
     }
 
