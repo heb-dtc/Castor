@@ -1,52 +1,94 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
+<ScrollView
     android:layout_height="match_parent"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    tools:context=".MainActivity">
+    android:layout_width="match_parent"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
 
-    <Button
-        android:id="@+id/doConnectButton"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:text="Do connect"/>
-
-    <Button
-        android:id="@+id/launchApplicationButton"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:text="Launch Application"
-        android:layout_below="@id/doConnectButton"/>
-
-    <Button
-        android:id="@+id/sendMessageButton"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:text="Send Message"
-        android:layout_below="@id/launchApplicationButton"/>
-
-    <Button
-        android:id="@+id/startServerButton"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:text="Start Server"
-        android:layout_below="@id/sendMessageButton"/>
-
-    <Button
-        android:id="@+id/stopServerButton"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:text="Stop Server"
-        android:enabled="false"
-        android:layout_below="@id/startServerButton"/>
-
-    <TextView
-        android:id="@+id/ipadressView"
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/stopServerButton"/>
+        android:layout_height="match_parent"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin"
+        android:paddingTop="@dimen/activity_vertical_margin"
+        android:paddingBottom="@dimen/activity_vertical_margin"
+        tools:context=".MainActivity">
 
-</RelativeLayout>
+        <Button
+            android:id="@+id/doConnectButton"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="Do connect" />
+
+        <Button
+            android:id="@+id/launchCastorApplicationButton"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="Launch Castor Application"
+            android:layout_below="@id/doConnectButton" />
+
+        <Button
+            android:id="@+id/launchCastPlayerApplicationButton"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="Launch Cast Player Application"
+            android:layout_below="@id/launchCastorApplicationButton" />
+
+        <Button
+            android:id="@+id/sendMessageButton"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:enabled="false"
+            android:text="Send Message"
+            android:layout_below="@id/launchCastPlayerApplicationButton" />
+
+        <Button
+            android:id="@+id/castImageButton"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="Cast Image"
+            android:layout_below="@id/sendMessageButton" />
+
+        <Button
+            android:id="@+id/castVideoButton"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="Cast Video"
+            android:layout_below="@id/castImageButton" />
+
+        <Button
+            android:id="@+id/castFileButton"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="Cast File"
+            android:layout_below="@id/castVideoButton" />
+
+        <Button
+            android:id="@+id/castMusicButton"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="Cast Music"
+            android:layout_below="@id/castFileButton" />
+
+        <Button
+            android:id="@+id/startServerButton"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="Start Server"
+            android:layout_below="@id/castMusicButton" />
+
+        <Button
+            android:id="@+id/stopServerButton"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="Stop Server"
+            android:enabled="false"
+            android:layout_below="@id/startServerButton" />
+
+        <TextView
+            android:id="@+id/ipadressView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/stopServerButton" />
+
+    </RelativeLayout>
+</ScrollView>
