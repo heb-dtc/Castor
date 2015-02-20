@@ -3,8 +3,10 @@ package com.heb.castor.app.server;
 import android.os.Environment;
 import android.util.Log;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.util.Random;
 
 public class EmbedHttpServer extends NanoHTTPD {
     private static final int PORT = 8080;
@@ -14,6 +16,7 @@ public class EmbedHttpServer extends NanoHTTPD {
     private static final String IMGAE_ENDPOINT = "/image";
     private static final String VIDEO_ENDPOINT = "/video";
     private static final String PDF_ENDPOINT = "/file";
+    private static final String STREAM_ENDPOINT = "/stream";
 
     public EmbedHttpServer() {
         super(PORT);
@@ -37,6 +40,8 @@ public class EmbedHttpServer extends NanoHTTPD {
             return serveVideoStream();
         } else if (uri.equals(PDF_ENDPOINT)) {
             return serveFile();
+        } else if (uri.equals(STREAM_ENDPOINT)) {
+            return serveStream();
         }
         return generateIndexHtml();
     }
@@ -57,16 +62,47 @@ public class EmbedHttpServer extends NanoHTTPD {
         return getFullResponse("application/pdf", "/Download/slides.pdf");
     }
 
+    private Response serveStream() {
+        return getFullResponse("application/pdf", "/Download/slides.pdf");
+    }
+
     private Response getFullResponse(String mimeType, String source) {
         FileInputStream fis = null;
         try {
             fis = new FileInputStream(Environment.getExternalStorageDirectory()
-                    + source );
+                    + source);
         } catch (FileNotFoundException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
         return new NanoHTTPD.Response(Response.Status.OK, mimeType, fis);
+    }
+
+    private Response getStreamResponse(String mimeType, String source) {
+        File file = new File(source);
+        long fileLength = file.length();
+
+        FileInputStream fis = null;
+        try {
+            fis = new FileInputStream(Environment.getExternalStorageDirectory()
+                    + source);
+        } catch (FileNotFoundException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
+        Random rnd = new Random();
+        String etag = Integer.toHexString(rnd.nextInt());
+        if (mimeType == null) {
+            mimeType = "application/octet-stream";
+        }
+        Response response = new Response(Response.Status.PARTIAL_CONTENT, mimeType, fis);
+        response.addHeader("ETag", etag);
+        response.addHeader("Content-Length", fileLength + "");
+        response.addHeader("Content-Range", "bytes " + 0 + "-" + fileLength + "/" + fileLength);
+        response.setChunkedTransfer(true);
+
+        return response;
     }
 
     private Response generateIndexHtml() {
