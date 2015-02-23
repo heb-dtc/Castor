@@ -13,6 +13,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.cast.ApplicationMetadata;
 import com.google.android.gms.cast.Cast;
@@ -166,7 +167,7 @@ public class MainActivity extends ActionBarActivity implements GoogleApiClient.C
     private void castImage() {
         String name = "floppies0005.png";
         String mimeType = "image/png";
-        String url = ipTextView.getText().toString() + ":8080/image";
+        String url = "http://" + ipTextView.getText().toString() + ":8080/image";
         int type = MediaMetadata.MEDIA_TYPE_PHOTO;
 
         sendDataToCastPlayer(name, mimeType, url, type);
@@ -175,7 +176,7 @@ public class MainActivity extends ActionBarActivity implements GoogleApiClient.C
     private void castVideo() {
         String name = "VID_20131207_195120.mp4";
         String mimeType = "video/mp4";
-        String url = ipTextView.getText().toString() + ":8080/video";
+        String url = "http://" + ipTextView.getText().toString() + ":8080/video";
         int type = MediaMetadata.MEDIA_TYPE_MOVIE;
 
         sendDataToCastPlayer(name, mimeType, url, type);
@@ -184,7 +185,7 @@ public class MainActivity extends ActionBarActivity implements GoogleApiClient.C
     private void castFile() {
         String name = "slides.pdf";
         String mimeType = "application/pdf";
-        String url = ipTextView.getText().toString() + ":8080/file";
+        String url = "http://" + ipTextView.getText().toString() + ":8080/file";
         int type = MediaMetadata.MEDIA_TYPE_GENERIC;
 
         sendDataToCastPlayer(name, mimeType, url, type);
@@ -193,7 +194,7 @@ public class MainActivity extends ActionBarActivity implements GoogleApiClient.C
     private void castMusic() {
         String name = "mc_soraal.mp3";
         String mimeType = "audio/mpeg";
-        String url = ipTextView.getText().toString() + ":8080/music";
+        String url = "http://" + ipTextView.getText().toString() + ":8080/music";
         int type = MediaMetadata.MEDIA_TYPE_MUSIC_TRACK;
 
         sendDataToCastPlayer(name, mimeType, url, type);
@@ -357,6 +358,8 @@ public class MainActivity extends ActionBarActivity implements GoogleApiClient.C
                                 } catch (IOException e) {
                                     Log.e(TAG, "Exception while creating channel", e);
                                 }
+
+
                             }
                         }
                     });
@@ -388,6 +391,19 @@ public class MainActivity extends ActionBarActivity implements GoogleApiClient.C
                                 } catch (IOException e) {
                                     Log.e(TAG, "Exception while creating channel", e);
                                 }
+
+                                castPlayer.requestStatus(googleApiClient)
+                                        .setResultCallback(new ResultCallback<RemoteMediaPlayer.MediaChannelResult>() {
+                                            @Override
+                                            public void onResult(RemoteMediaPlayer.MediaChannelResult mediaChannelResult) {
+                                                if (!mediaChannelResult.getStatus().isSuccess()) {
+                                                    Log.e(TAG, "Failed to request status.");
+                                                }
+
+                                                Toast.makeText(getApplicationContext(), "App Launch, status read",
+                                                        Toast.LENGTH_SHORT).show();;
+                                            }
+                                        });
                             }
                         }
                     });
@@ -415,8 +431,11 @@ public class MainActivity extends ActionBarActivity implements GoogleApiClient.C
             @Override
             public void onStatusUpdated() {
                 MediaStatus mediaStatus = castPlayer.getMediaStatus();
-                boolean isPlaying = mediaStatus.getPlayerState() == MediaStatus.PLAYER_STATE_PLAYING;
-                //TODO: do stuff
+
+                if (mediaStatus != null) {
+                    boolean isPlaying = mediaStatus.getPlayerState() == MediaStatus.PLAYER_STATE_PLAYING;
+                    //TODO: do stuff
+                }
             }
         });
     }
@@ -463,6 +482,8 @@ public class MainActivity extends ActionBarActivity implements GoogleApiClient.C
     @Override
     public void onConnectionFailed(ConnectionResult connectionResult) {
         Log.e(TAG, "Failed to connect: " + connectionResult.getErrorCode());
+
+        Toast.makeText(getApplicationContext(), "Connection failed", Toast.LENGTH_SHORT).show();
     }
 
     // GoogleApiClient.ConnectionCallbacks.onConnected
@@ -470,6 +491,7 @@ public class MainActivity extends ActionBarActivity implements GoogleApiClient.C
     public void onConnected(Bundle bundle) {
         //TODO: no auto launch for now
         //launchCastPlayerApplication();
+        Toast.makeText(getApplicationContext(), "Connection successful", Toast.LENGTH_SHORT).show();
     }
 
     @Override
