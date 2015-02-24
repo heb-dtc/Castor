@@ -106,17 +106,24 @@ public class EmbedHttpServer extends NanoHTTPD {
     private Response getStreamResponse(String mimeType, String source, String rangeHeader) {
         String localFilePath = Environment.getExternalStorageDirectory() + source;
         File file = new File(localFilePath);
-        long fileLength = file.length();
+
+        long absoluteFileLength = file.length();
+        long relativeFileLength = absoluteFileLength - 1; //ContentRange is 0 based, need to substract 1
+
         long start;
         long end;
-        long size = fileLength - 1;
 
-        //range header is like "-258"
+        //Todo: deal with range header support
+        /*if (rangeHeader.isEmpty()) {
+
+        }*/
+
         if (rangeHeader.startsWith(RANGE_VALUE_SEPARATOR)) {
             long rangeValue = Long.parseLong(rangeHeader.substring(RANGE_VALUE_SEPARATOR.length()));
-            end = size;
-            start = size - rangeValue;
-        } else { //range header is like "bytes=145-586" or "bytes=0-"
+            end = relativeFileLength;
+            start = relativeFileLength - rangeValue;
+        } else {
+            //range header is like "bytes=145-586" or "bytes=0-"
             String rangeValues = rangeHeader.substring(RANGE_PREFIX.length(), rangeHeader.length());
             String[] values = rangeValues.split(RANGE_VALUE_SEPARATOR);
             start = Long.parseLong(values[0]);
@@ -124,46 +131,65 @@ public class EmbedHttpServer extends NanoHTTPD {
             if (values.length > 1) {
                 end = Long.parseLong(values[1]);
             } else {
-                end = size/4;
+                end = relativeFileLength;
             }
         }
 
         //sanity check
-        if (end > fileLength - 1) {
-            end = fileLength - 1;
+        if (end > absoluteFileLength) {
+            end = absoluteFileLength;
         }
 
         if (start <= end) {
             long contentLength = end - start + 1;
 
-            FileInputStream fis = null;
+            FileInputStream stream = null;
             try {
-                fis = new FileInputStream(localFilePath);
-                fis.skip(start);
+                stream = new FileInputStream(localFilePath);
+                stream.skip(start);
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             } catch (IOException ioe) {
                 ioe.printStackTrace();
             }
 
-            Random rnd = new Random();
-            String etag = Integer.toHexString(rnd.nextInt());
-
-            if (mimeType == null) {
+            //Todo: not needed
+            /*if (mimeType == null) {
                 mimeType = "application/octet-stream";
-            }
+            }*/
 
-            Response response = new Response(Response.Status.PARTIAL_CONTENT, mimeType, fis);
-            response.addHeader("ETag", etag);
-            response.addHeader("Content-Length", contentLength + "");
-            response.addHeader("Content-Range", "bytes " + start + "-" + end + "/" + fileLength);
+            Response response = new Response(Response.Status.PARTIAL_CONTENT, mimeType, stream);
             response.addHeader("Content-Type", mimeType);
-            response.setChunkedTransfer(true);
+            response.addHeader("Connection", "keep-alive");
+            response.addHeader("ETag", generateEtag());
+            response.addHeader("Content-Length", String.valueOf(contentLength));
+            response.addHeader("Content-Range", buildContentRangeHeader(start, end, absoluteFileLength));
+
+            //Todo: check if needed (set Transfer-Encoding: chunked
+            //response.setChunkedTransfer(true);
 
             return response;
         } else {
             return new Response(Response.Status.RANGE_NOT_SATISFIABLE, mimeType, rangeHeader);
         }
+    }
+
+    String generateEtag() {
+        Random rnd = new Random();
+        return Integer.toHexString(rnd.nextInt());
+    }
+
+    String buildContentRangeHeader(long startValue, long endValue, long absoluteFileLength) {
+        StringBuilder builder = new StringBuilder();
+        builder.append("bytes");
+        builder.append(startValue);
+        builder.append("-");
+        builder.append(endValue);
+        builder.append("/");
+        builder.append(absoluteFileLength);
+        builder.append("\n\r");
+
+        return builder.toString();
     }
 
     private Response generateIndexHtml() {
