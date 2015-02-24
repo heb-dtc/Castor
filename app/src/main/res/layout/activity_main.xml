@@ -70,11 +70,32 @@
             android:layout_below="@id/castFileButton" />
 
         <Button
+            android:id="@+id/playButton"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="Play"
+            android:layout_below="@id/castMusicButton" />
+
+        <Button
+            android:id="@+id/pauseButton"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="Pause"
+            android:layout_below="@id/playButton" />
+
+        <Button
+            android:id="@+id/stopButton"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="Stop"
+            android:layout_below="@id/pauseButton" />
+
+        <Button
             android:id="@+id/startServerButton"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:text="Start Server"
-            android:layout_below="@id/castMusicButton" />
+            android:layout_below="@id/stopButton" />
 
         <Button
             android:id="@+id/stopServerButton"

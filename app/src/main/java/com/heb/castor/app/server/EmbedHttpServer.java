@@ -164,6 +164,7 @@ public class EmbedHttpServer extends NanoHTTPD {
             response.addHeader("ETag", generateEtag());
             response.addHeader("Content-Length", String.valueOf(contentLength));
             response.addHeader("Content-Range", buildContentRangeHeader(start, end, absoluteFileLength));
+            response.addHeader("Accept-Ranges", "bytes");
 
             //Todo: check if needed (set Transfer-Encoding: chunked
             //response.setChunkedTransfer(true);
@@ -181,13 +182,12 @@ public class EmbedHttpServer extends NanoHTTPD {
 
     String buildContentRangeHeader(long startValue, long endValue, long absoluteFileLength) {
         StringBuilder builder = new StringBuilder();
-        builder.append("bytes");
+        builder.append("bytes ");
         builder.append(startValue);
         builder.append("-");
         builder.append(endValue);
         builder.append("/");
         builder.append(absoluteFileLength);
-        builder.append("\n\r");
 
         return builder.toString();
     }
