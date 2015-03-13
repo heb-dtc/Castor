@@ -14,11 +14,9 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.google.android.gms.cast.Cast;
 import com.google.android.gms.cast.CastDevice;
 import com.google.android.gms.cast.CastMediaControlIntent;
-import com.google.android.gms.cast.MediaInfo;
 import com.google.android.gms.cast.MediaMetadata;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -29,9 +27,9 @@ import com.heb.castor.app.server.EmbedHttpServer;
 
 import java.io.IOException;
 
-public class MainActivity extends ActionBarActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
+public class ControlActivity extends ActionBarActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
-    private static final String TAG = MainActivity.class.getSimpleName();
+    private static final String TAG = ControlActivity.class.getSimpleName();
 
     private MediaRouter mediaRouter;
     private MediaRouteSelector mediaRouteSelector;
@@ -41,7 +39,6 @@ public class MainActivity extends ActionBarActivity implements GoogleApiClient.C
     private GoogleApiClient googleApiClient;
     private EmbedHttpServer httpServer;
     private String appId;
-
 
     private Button launchCastorApplicationButton;
     private Button launchCastPlayerApplicationButton;
