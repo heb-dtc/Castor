@@ -7,6 +7,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -24,6 +25,7 @@ import java.util.List;
 public class HomeActivity extends ActionBarActivity {
 
     private DrawerLayout drawerLayout;
+    private ActionBarDrawerToggle drawerToggle;
     private ListView drawerList;
 
     private ArrayAdapter drawerAdapter;
@@ -38,6 +40,24 @@ public class HomeActivity extends ActionBarActivity {
 
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawerList = (ListView) findViewById(R.id.left_drawer);
+
+        //TODO: use ToolBar instead of deprecated ActionBar
+        drawerToggle = new ActionBarDrawerToggle(this, drawerLayout,
+                null, R.string.navigation_drawer_open, R.string.navigation_drawer_close) {
+
+            public void onDrawerClosed(View view) {
+                super.onDrawerClosed(view);
+                getActionBar().setTitle(title);
+                invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
+            }
+
+            public void onDrawerOpened(View drawerView) {
+                super.onDrawerOpened(drawerView);
+                getActionBar().setTitle(title);
+                invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
+            }
+
+        };
 
         initializeDrawerAdapter();
         drawerList.setAdapter(drawerAdapter);
