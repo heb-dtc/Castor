@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -22,7 +21,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class HomeActivity extends ActionBarActivity {
+public class HomeActivity extends BaseActivity {
 
     private DrawerLayout drawerLayout;
     private ActionBarDrawerToggle drawerToggle;
@@ -36,14 +35,13 @@ public class HomeActivity extends ActionBarActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_home);
 
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawerList = (ListView) findViewById(R.id.left_drawer);
 
         //TODO: use ToolBar instead of deprecated ActionBar
         drawerToggle = new ActionBarDrawerToggle(this, drawerLayout,
-                null, R.string.navigation_drawer_open, R.string.navigation_drawer_close) {
+                getToolbar(), R.string.navigation_drawer_open, R.string.navigation_drawer_close) {
 
             public void onDrawerClosed(View view) {
                 super.onDrawerClosed(view);
@@ -64,6 +62,11 @@ public class HomeActivity extends ActionBarActivity {
         drawerList.setOnItemClickListener(new DrawerItemClickListener());
 
         title = getTitle();
+    }
+
+    @Override
+    public int getLayoutResource() {
+        return R.layout.activity_home;
     }
 
     private void initializeDrawerAdapter() {

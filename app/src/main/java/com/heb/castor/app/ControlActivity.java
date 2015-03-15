@@ -3,7 +3,6 @@ package com.heb.castor.app;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.support.v4.view.MenuItemCompat;
-import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.MediaRouteActionProvider;
 import android.support.v7.media.MediaRouteSelector;
 import android.support.v7.media.MediaRouter;
@@ -14,6 +13,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import com.google.android.gms.cast.Cast;
 import com.google.android.gms.cast.CastDevice;
 import com.google.android.gms.cast.CastMediaControlIntent;
@@ -27,7 +27,7 @@ import com.heb.castor.app.server.EmbedHttpServer;
 
 import java.io.IOException;
 
-public class ControlActivity extends ActionBarActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
+public class ControlActivity extends BaseActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
     private static final String TAG = ControlActivity.class.getSimpleName();
 
@@ -58,7 +58,8 @@ public class ControlActivity extends ActionBarActivity implements GoogleApiClien
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         launchCastPlayerApplicationButton = (Button) findViewById(R.id.launchCastPlayerApplicationButton);
         launchCastorApplicationButton = (Button) findViewById(R.id.launchCastorApplicationButton);
@@ -169,6 +170,11 @@ public class ControlActivity extends ActionBarActivity implements GoogleApiClien
         });
 
         setupMediaRouter();
+    }
+
+    @Override
+    public int getLayoutResource() {
+        return R.layout.activity_main;
     }
 
     private void setupMediaRouter() {
