@@ -61,6 +61,10 @@ public class HomeActivity extends BaseActivity {
         drawerList.setOnItemClickListener(new DrawerItemClickListener());
 
         title = getTitle();
+
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.main_container, new GalleryFragment())
+                .commit();
     }
 
     @Override
