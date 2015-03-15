@@ -39,7 +39,6 @@ public class HomeActivity extends BaseActivity {
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawerList = (ListView) findViewById(R.id.left_drawer);
 
-        //TODO: use ToolBar instead of deprecated ActionBar
         drawerToggle = new ActionBarDrawerToggle(this, drawerLayout,
                 getToolbar(), R.string.navigation_drawer_open, R.string.navigation_drawer_close) {
 
@@ -69,6 +68,7 @@ public class HomeActivity extends BaseActivity {
         return R.layout.activity_home;
     }
 
+    //Todo: init with constant from strings
     private void initializeDrawerAdapter() {
         String[] entries = {"Images", "Videos", "Music"};
         drawerEntries = new ArrayList<>();
@@ -77,6 +77,7 @@ public class HomeActivity extends BaseActivity {
         drawerAdapter = new ArrayAdapter<String>(this, R.layout.drawer_list_item, drawerEntries);
     }
 
+    //Todo: needed?
     public void restoreActionBar() {
         ActionBar actionBar = getSupportActionBar();
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
