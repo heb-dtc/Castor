@@ -9,7 +9,7 @@
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
-    <string name="preference_ip_label">Http Server IP adress</string>
+    <string name="preference_ip_label">Http Server IP address</string>
     <string name="preference_ip_default">0.0.0.0</string>
     <string name="preference_http_server_key">server</string>
     <string name="preference_http_server_label">Start server</string>
